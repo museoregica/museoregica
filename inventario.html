@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Inventario de Museo</title>
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/sidebar.css">
+  <link rel="stylesheet" href="css/global.css">
+
+</head>
+<body>
+  <div id="main-content">
+    <h1>Inventario de Museo</h1>
+    <p>Bienvenido a la sección de Inventario del Museo.</p>
+
+    <!-- Input para buscar piezas -->
+    <input type="text" id="searchInput" placeholder="Buscar por nombre de la pieza..." oninput="searchPieces()">
+
+    <!-- Botón para abrir el formulario de agregar piezas -->
+    <button onclick="openAddPieceModal()">Agregar Pieza</button>
+
+    <!-- Formulario para agregar piezas en un modal -->
+    <div class="modal-background" id="modalBackground" onclick="closeAddPieceModal()"></div>
+    <div class="employee-form" id="pieceForm">
+      <h2 id="formTitle">Agregar Pieza</h2>
+      <label for="name">Nombre de la Pieza:</label>
+      <input type="text" id="name" name="name" placeholder="Nombre de la pieza">
+      <label for="culture">Cultura:</label>
+      <input type="text" id="culture" name="culture" placeholder="Cultura a la que pertenece">
+      <label for="location">Lugar de Origen:</label>
+      <input type="text" id="location" name="location" placeholder="Provincia, departamento, distrito">
+      <label for="currentLocation">Ubicación Actual:</label>
+      <input type="text" id="currentLocation" name="currentLocation" placeholder="Ubicación en el museo">
+      <div class="button-container">
+        <button onclick="savePiece()">
+          <span class="material-icons">check</span>
+        </button>
+        <button onclick="closeAddPieceModal()">
+          <span class="material-icons">close</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Lista de piezas del museo -->
+    <h2>Lista de Piezas</h2>
+    <ul class="employee-list" id="pieceList"></ul>
+  </div>
+
+  <!-- Sidebar Container -->
+  <div id="sidebar-container"></div>
+
+  <script src="js/sidebar.js"></script>
+  <script>
+    /* ===================== Inicio de la declaración de constantes ===================== */
+    const pieceList = document.getElementById('pieceList');
+    const pieceForm = document.getElementById('pieceForm');
+    const modalBackground = document.getElementById('modalBackground');
+    const searchInput = document.getElementById('searchInput');
+    let editingPieceIndex = null;
+    /* ===================== Fin de la declaración de constantes ===================== */
+
+    /* ===================== Inicio de la función para abrir el modal de agregar piezas ===================== */
+    // Función para abrir el modal de agregar piezas
+    function openAddPieceModal(piece = null) {
+      if (piece) {
+        document.getElementById('formTitle').innerText = 'Editar Pieza';
+        document.getElementById('name').value = piece.name;
+        document.getElementById('culture').value = piece.culture;
+        document.getElementById('location').value = piece.location;
+        document.getElementById('currentLocation').value = piece.currentLocation;
+        editingPieceIndex = piece.index;
+      } else {
+        document.getElementById('formTitle').innerText = 'Agregar Pieza';
+        // Limpiar los campos del formulario
+        document.getElementById('name').value = '';
+        document.getElementById('culture').value = '';
+        document.getElementById('location').value = '';
+        document.getElementById('currentLocation').value = '';
+        editingPieceIndex = null;
+      }
+      pieceForm.style.display = 'block';
+      modalBackground.style.display = 'block';
+    }
+    /* ===================== Fin de la función para abrir el modal de agregar piezas ===================== */
+
+    /* ===================== Inicio de la función para cerrar el modal de agregar piezas ===================== */
+    // Función para cerrar el modal de agregar piezas
+    function closeAddPieceModal() {
+      pieceForm.style.display = 'none';
+      modalBackground.style.display = 'none';
+    }
+    /* ===================== Fin de la función para cerrar el modal de agregar piezas ===================== */
+
+    /* ===================== Inicio de la función para cargar piezas desde localStorage ===================== */
+    // Función para cargar piezas desde localStorage
+    function loadPieces() {
+      const pieces = JSON.parse(localStorage.getItem('piezas')) || [];
+      displayPieces(pieces);
+    }
+    /* ===================== Fin de la función para cargar piezas desde localStorage ===================== */
+
+    /* ===================== Inicio de la función para mostrar piezas ===================== */
+    // Función para mostrar piezas en la lista
+    function displayPieces(pieces) {
+      pieceList.innerHTML = '';
+      pieces.forEach((piece, index) => {
+        const pieceItem = document.createElement('li');
+        pieceItem.classList.add('employee-list-item');
+        pieceItem.innerHTML = `
+          <div>
+            <strong>${piece.name}</strong> <br>
+            <small>Cultura: ${piece.culture}</small> <br>
+            <small>Origen: ${piece.location}</small> <br>
+            <small>Ubicación Actual: ${piece.currentLocation}</small>
+          </div>
+          <div class="employee-list-item-actions">
+            <span class="material-icons" onclick="openEditPieceModal(${index})">edit</span>
+            <span class="material-icons" onclick="deletePiece(this, ${index})">delete</span>
+          </div>
+        `;
+        pieceList.appendChild(pieceItem);
+      });
+    }
+    /* ===================== Fin de la función para mostrar piezas ===================== */
+
+    /* ===================== Inicio de la función para guardar piezas ===================== */
+    // Función para guardar piezas (agregar o editar)
+    function savePiece() {
+      const name = document.getElementById('name').value;
+      const culture = document.getElementById('culture').value;
+      const location = document.getElementById('location').value;
+      const currentLocation = document.getElementById('currentLocation').value;
+
+      if (name && culture && location && currentLocation) {
+        const pieces = JSON.parse(localStorage.getItem('piezas')) || [];
+        if (editingPieceIndex !== null) {
+          pieces[editingPieceIndex] = { name, culture, location, currentLocation };
+        } else {
+          pieces.push({ name, culture, location, currentLocation });
+        }
+        localStorage.setItem('piezas', JSON.stringify(pieces));
+
+        // Cerrar el modal
+        closeAddPieceModal();
+
+        // Recargar la lista de piezas
+        loadPieces();
+      } else {
+        alert('Por favor, complete todos los campos');
+      }
+    }
+    /* ===================== Fin de la función para guardar piezas ===================== */
+
+    /* ===================== Inicio de la función para abrir el modal de edición con los datos de la pieza ===================== */
+    // Función para abrir el modal de edición con los datos de la pieza
+    function openEditPieceModal(index) {
+      const pieces = JSON.parse(localStorage.getItem('piezas')) || [];
+      const piece = pieces[index];
+      if (piece) {
+        piece.index = index;
+        openAddPieceModal(piece);
+      }
+    }
+    /* ===================== Fin de la función para abrir el modal de edición con los datos de la pieza ===================== */
+
+    /* ===================== Inicio de la función para eliminar piezas ===================== */
+    // Función para eliminar piezas
+    function deletePiece(element, index) {
+      let pieces = JSON.parse(localStorage.getItem('piezas')) || [];
+      pieces.splice(index, 1);
+      localStorage.setItem('piezas', JSON.stringify(pieces));
+      element.parentElement.parentElement.remove();
+    }
+    /* ===================== Fin de la función para eliminar piezas ===================== */
+
+    /* ===================== Inicio de la función para buscar piezas ===================== */
+    // Función para buscar piezas por nombre
+    function searchPieces() {
+      const query = searchInput.value.toLowerCase();
+      const pieces = JSON.parse(localStorage.getItem('piezas')) || [];
+      if (query) {
+        const filteredPieces = pieces.filter(piece => piece.name.toLowerCase().includes(query));
+        displayPieces(filteredPieces);
+      } else {
+        displayPieces(pieces);
+      }
+    }
+    /* ===================== Fin de la función para buscar piezas ===================== */
+
+    /* ===================== Inicio de la carga de piezas al cargar la página ===================== */
+    // Cargar piezas al cargar la página
+    window.onload = loadPieces;
+    /* ===================== Fin de la carga de piezas al cargar la página ===================== */
+  </script>
+</body>
+</html>

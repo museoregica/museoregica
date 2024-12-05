@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gestión de Movimientos</title>
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/sidebar.css">
+  <link rel="stylesheet" href="css/global.css">
+</head>
+
+<body>
+  <div id="main-content">
+    <h1>Gestión de Movimientos</h1>
+    <p>Bienvenido a la sección de Gestión de Movimientos.</p>
+
+    <!-- Input para buscar movimientos -->
+    <input type="text" id="searchInput" placeholder="Buscar por nombre de la pieza..." oninput="debouncedSearchMovements()">
+
+    <!-- Botón para abrir el formulario de agregar movimientos -->
+    <button onclick="openAddMovementModal()">Agregar Movimiento</button>
+
+    <!-- Formulario para agregar movimientos en un modal -->
+    <div class="modal-background" id="modalBackground" onclick="closeAddMovementModal()"></div>
+    <div class="employee-form" id="movementForm">
+      <h2 id="formTitle">Agregar Movimiento</h2>
+
+      <!-- Lista desplegable de piezas (cargadas del inventario) -->
+      <label for="piece">Pieza:</label>
+      <select id="piece" name="piece">
+        <!-- Las piezas se cargarán dinámicamente -->
+      </select>
+
+      <label for="currentLocation">Ubicación Actual:</label>
+      <input type="text" id="currentLocation" name="currentLocation" placeholder="Ubicación en el museo">
+
+      <label for="destination">Destino:</label>
+      <input type="text" id="destination" name="destination" placeholder="Destino de la pieza">
+
+      <label for="reason">Motivo:</label>
+      <input type="text" id="reason" name="reason" placeholder="Motivo del movimiento">
+
+      <label for="inCharge">Encargado:</label>
+      <input type="text" id="inCharge" name="inCharge" placeholder="Nombre del encargado">
+
+      <div class="button-container">
+        <button onclick="saveMovement()">
+          <span class="material-icons">check</span>
+        </button>
+        <button onclick="closeAddMovementModal()">
+          <span class="material-icons">close</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Lista de movimientos -->
+    <h2>Lista de Movimientos</h2>
+    <ul class="employee-list" id="movementList"></ul>
+  </div>
+
+
+    <!-- Sidebar Container -->
+    <div id="sidebar-container"></div>
+
+    <script src="js/sidebar.js"></script>
+  <script>
+    /* ===================== Variables Globales ===================== */
+    const movementList = document.getElementById('movementList');
+    const movementForm = document.getElementById('movementForm');
+    const modalBackground = document.getElementById('modalBackground');
+    const pieceSelect = document.getElementById('piece');
+    const searchInput = document.getElementById('searchInput');
+    let editingMovementIndex = null;
+    let searchTimeout = null;
+
+    /* ===================== Función para cargar las piezas desde el inventario ===================== */
+    function loadInventory() {
+      const inventory = JSON.parse(localStorage.getItem('piezas')) || [];
+      pieceSelect.innerHTML = '<option value="">Selecciona una pieza</option>';
+
+      if (inventory.length === 0) {
+        alert('El inventario está vacío. Por favor, agrega piezas primero.');
+        return;
+      }
+
+      inventory.forEach(piece => {
+        const option = document.createElement('option');
+        option.value = piece.name;
+        option.text = piece.name;
+        pieceSelect.appendChild(option);
+      });
+    }
+
+    /* ===================== Función para abrir el modal de agregar movimientos ===================== */
+    function openAddMovementModal(movement = null) {
+      document.getElementById('formTitle').innerText = movement ? 'Editar Movimiento' : 'Agregar Movimiento';
+
+      // Si es edición, cargar datos existentes
+      if (movement) {
+        pieceSelect.value = movement.piece;
+        document.getElementById('currentLocation').value = movement.currentLocation;
+        document.getElementById('destination').value = movement.destination;
+        document.getElementById('reason').value = movement.reason;
+        document.getElementById('inCharge').value = movement.inCharge;
+        editingMovementIndex = movement.index;
+      } else {
+        // Limpiar campos
+        pieceSelect.value = '';
+        document.getElementById('currentLocation').value = '';
+        document.getElementById('destination').value = '';
+        document.getElementById('reason').value = '';
+        document.getElementById('inCharge').value = '';
+        editingMovementIndex = null;
+      }
+
+      movementForm.style.display = 'block';
+      modalBackground.style.display = 'block';
+    }
+
+    /* ===================== Función para cerrar el modal de agregar movimientos ===================== */
+    function closeAddMovementModal() {
+      movementForm.style.display = 'none';
+      modalBackground.style.display = 'none';
+    }
+
+    /* ===================== Función para guardar movimientos ===================== */
+    function saveMovement() {
+      const piece = pieceSelect.value;
+      const currentLocation = document.getElementById('currentLocation').value.trim();
+      const destination = document.getElementById('destination').value.trim();
+      const reason = document.getElementById('reason').value.trim();
+      const inCharge = document.getElementById('inCharge').value.trim();
+
+      if (!piece || !currentLocation || !destination || !reason || !inCharge) {
+        alert('Por favor, complete todos los campos');
+        return;
+      }
+
+      const movements = JSON.parse(localStorage.getItem('movimientos')) || [];
+      const newMovement = { piece, currentLocation, destination, reason, inCharge };
+
+      if (editingMovementIndex !== null) {
+        movements[editingMovementIndex] = newMovement;
+      } else {
+        movements.push(newMovement);
+      }
+
+      localStorage.setItem('movimientos', JSON.stringify(movements));
+      closeAddMovementModal();
+      loadMovements();
+    }
+
+    /* ===================== Función para mostrar movimientos ===================== */
+    function loadMovements() {
+      const movements = JSON.parse(localStorage.getItem('movimientos')) || [];
+      displayMovements(movements);
+    }
+
+    function displayMovements(movements) {
+      movementList.innerHTML = movements.length
+        ? movements.map((movement, index) => `
+            <li class="employee-list-item">
+              <div>
+                <strong>${movement.piece}</strong><br>
+                <small>Ubicación Actual: ${movement.currentLocation}</small><br>
+                <small>Destino: ${movement.destination}</small><br>
+                <small>Motivo: ${movement.reason}</small><br>
+                <small>Encargado: ${movement.inCharge}</small>
+              </div>
+              <div class="employee-list-item-actions">
+                <span class="material-icons" onclick="openAddMovementModal({...${JSON.stringify(movement)}, index: ${index}})">edit</span>
+                <span class="material-icons" onclick="deleteMovement(${index})">delete</span>
+              </div>
+            </li>
+          `).join('')
+        : '<li>No hay movimientos registrados.</li>';
+    }
+
+    /* ===================== Función para eliminar movimiento ===================== */
+    function deleteMovement(index) {
+      const movements = JSON.parse(localStorage.getItem('movimientos')) || [];
+      movements.splice(index, 1);
+      localStorage.setItem('movimientos', JSON.stringify(movements));
+      loadMovements();
+    }
+
+    /* ===================== Función para buscar movimientos ===================== */
+    function debouncedSearchMovements() {
+      clearTimeout(searchTimeout);
+      searchTimeout = setTimeout(() => {
+        const query = searchInput.value.toLowerCase();
+        const movements = JSON.parse(localStorage.getItem('movimientos')) || [];
+        const filteredMovements = movements.filter(movement => movement.piece.toLowerCase().includes(query));
+        displayMovements(filteredMovements);
+      }, 300);
+    }
+/* ===================== Función para manejar la navegación entre secciones ===================== */
+function navigateTo(section) {
+      if (section === 'movimientos') {
+        alert('Ya estás en Movimiento.');
+        return;
+      }
+      // Aquí puedes implementar lógica para cambiar a otras secciones.
+      alert(`Navegando a la sección: ${section}`);
+    }
+    
+
+    /* ===================== Inicialización ===================== */
+    loadInventory();
+    loadMovements();
+  </script>
+</body>
+
+</html>

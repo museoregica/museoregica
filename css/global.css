@@ -1,0 +1,211 @@
+/* ===================== Inicio del diseño del cuerpo (body) ===================== */
+body {
+  font-family: 'Roboto', sans-serif; /* Fuente utilizada en todo el documento */
+  padding-bottom: 70px; /* Padding adicional para la parte inferior */
+  background-color: #f0f0f0; /* Color de fondo del cuerpo */
+  overflow-x: hidden; /* Elimina el scroll horizontal */
+  position: relative;
+}
+
+#main-content {
+  padding: 20px; /* Espaciado interno del contenido principal */
+}
+
+h1, h2 {
+  font-weight: 500; /* Grosor del texto para los títulos */
+  color: #333; /* Color de los títulos */
+}
+
+button {
+  background-color: #6200ea; /* Color de fondo de los botones */
+  color: white; /* Color del texto del botón */
+  border: none; /* Sin borde */
+  padding: 10px 20px; /* Espaciado interno del botón */
+  border-radius: 8px; /* Bordes redondeados del botón */
+  cursor: pointer; /* Cambia el cursor al pasar por encima del botón */
+  font-weight: 500; /* Grosor del texto del botón */
+  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1); /* Sombra del botón */
+  transition: background-color 0.3s ease; /* Transición al cambiar el color de fondo */
+  margin-bottom: 20px; /* Margen inferior del botón */
+}
+
+button:hover {
+  background-color: #3700b3; /* Color de fondo del botón al pasar el cursor */
+}
+/* ===================== Fin del diseño del cuerpo (body) ===================== */
+
+/* ===================== Inicio del diseño del formulario ===================== */
+.employee-form {
+  display: none; /* Oculto por defecto */
+  position: fixed; /* Posición fija */
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%); /* Centrar en la pantalla */
+  width: 90%;
+  max-width: 300px; /* Ancho máximo del formulario */
+  background-color: #ffffff; /* Color de fondo del formulario */
+  padding: 10px; /* Espaciado interno del formulario */
+  border-radius: 12px; /* Bordes redondeados */
+  box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.2); /* Sombra del formulario */
+  z-index: 1000; /* Prioridad sobre otros elementos */
+  overflow-y: auto; /* Scroll vertical si el contenido es grande */
+  max-height: 80vh; /* Altura máxima del formulario */
+}
+
+.employee-form label {
+  display: block; /* Los labels ocupan toda la línea */
+  margin-bottom: 8px; /* Margen inferior del label */
+  font-weight: bold; /* Texto en negrita */
+  font-size: 12px; /* Tamaño del texto del label */
+  color: #333; /* Color del texto del label */
+}
+
+.employee-form input {
+  width: calc(100% - 16px); /* Ancho del input */
+  padding: 10px; /* Espaciado interno del input */
+  margin-bottom: 15px; /* Margen inferior del input */
+  border: 1px solid #ddd; /* Borde del input */
+  border-radius: 6px; /* Bordes redondeados del input */
+  outline: none; /* Sin contorno al enfocar */
+  transition: all 0.3s ease; /* Transición al cambiar el borde */
+  box-shadow: inset 0px 1px 3px rgba(0, 0, 0, 0.1); /* Sombra interna del input */
+  font-size: 12px; /* Tamaño del texto del input */
+}
+
+.employee-form input:focus {
+  border: 2px solid #6200ea; /* Borde del input al enfocar */
+  box-shadow: 0px 0px 5px rgba(98, 0, 234, 0.5); /* Sombra del input al enfocar */
+}
+
+.employee-form .button-container {
+  display: flex; /* Utilizar flexbox */
+  justify-content: center; /* Centrar los botones */
+  gap: 8px; /* Espaciado entre los botones */
+}
+
+.employee-form button {
+  width: 40px; /* Ancho del botón */
+  height: 40px; /* Altura del botón */
+  border-radius: 50%; /* Bordes completamente redondeados */
+  display: flex; /* Utilizar flexbox */
+  align-items: center; /* Centrar verticalmente el contenido del botón */
+  justify-content: center; /* Centrar horizontalmente el contenido del botón */
+}
+
+.employee-form button span {
+  font-size: 20px; /* Tamaño del icono dentro del botón */
+}
+/* ===================== Fin del diseño del formulario ===================== */
+
+/* ===================== Inicio del diseño de la lista de empleados ===================== */
+.employee-list {
+  list-style: none; /* Quitar los puntos de la lista */
+  padding: 0; /* Sin padding en la lista */
+}
+
+.employee-list-item {
+  background-color: #ffffff; /* Color de fondo de cada elemento de la lista */
+  padding: 15px; /* Espaciado interno de cada elemento */
+  margin-bottom: 10px; /* Margen inferior entre elementos */
+  border-radius: 12px; /* Bordes redondeados de cada elemento */
+  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1); /* Sombra de cada elemento */
+  display: flex; /* Utilizar flexbox */
+  align-items: center; /* Alinear verticalmente */
+  justify-content: space-between; /* Justificar el contenido a los extremos */
+  transition: box-shadow 0.3s ease; /* Transición al cambiar la sombra */
+}
+
+.employee-list-item:hover {
+  box-shadow: 0px 6px 10px rgba(0, 0, 0, 0.15); /* Sombra al pasar el cursor por el elemento */
+}
+
+.employee-list-item div {
+  flex: 1 1 auto; /* Flexibilidad del contenedor */
+  min-width: 100px; /* Ancho mínimo del contenedor */
+}
+
+.employee-list-item-actions {
+  display: flex; /* Utilizar flexbox para las acciones */
+  flex-direction: column; /* Alinear las acciones en columna */
+  gap: 8px; /* Espaciado entre los íconos de acción */
+  margin-left: auto; /* Margen automático a la izquierda */
+  align-items: flex-end; /* Alinear los íconos al final */
+}
+
+.employee-list-item .material-icons {
+  cursor: pointer; /* Cambiar el cursor al pasar por el ícono */
+  color: #6200ea; /* Color del ícono */
+  transition: color 0.3s; /* Transición al cambiar el color */
+}
+
+.employee-list-item .material-icons:hover {
+  color: #3700b3; /* Color del ícono al pasar el cursor */
+}
+/* ===================== Fin del diseño de la lista de empleados ===================== */
+
+/* ===================== Inicio del diseño del fondo del modal ===================== */
+.modal-background {
+  display: none; /* Oculto por defecto */
+  position: fixed; /* Posición fija cubriendo toda la pantalla */
+  top: 0;
+  left: 0;
+  width: 100%; /* Ancho completo */
+  height: 100%; /* Altura completa */
+  background-color: rgba(0, 0, 0, 0.5); /* Fondo semi-transparente */
+  z-index: 999; /* Prioridad sobre otros elementos */
+}
+/* ===================== Fin del diseño del fondo del modal ===================== */
+
+/* ===================== Inicio del diseño responsivo ===================== */
+@media (max-width: 480px) {
+  .employee-form {
+    width: 95%; /* Ancho del formulario para pantallas pequeñas */
+    max-width: 220px; /* Ancho máximo reducido para pantallas pequeñas */
+    padding: 8px; /* Espaciado interno reducido */
+  }
+
+  .employee-form input {
+    padding: 8px; /* Espaciado interno reducido para inputs */
+    margin-bottom: 10px; /* Margen inferior reducido */
+    font-size: 10px; /* Tamaño de fuente reducido */
+  }
+
+  .employee-form label {
+    font-size: 10px; /* Tamaño de fuente reducido para labels */
+  }
+
+  .employee-form .button-container button {
+    width: 36px; /* Ancho reducido de los botones */
+    height: 36px; /* Altura reducida de los botones */
+    font-size: 18px; /* Tamaño del icono reducido */
+  }
+
+  .employee-list-item {
+    padding: 10px; /* Espaciado interno reducido de cada elemento */
+  }
+
+  .employee-list-item div {
+    min-width: 80px; /* Ancho mínimo reducido para contenedores */
+  }
+}
+/* ===================== Fin del diseño responsivo ===================== */
+
+
+/* ===================== Inicio del diseño del input de búsqueda ===================== */
+#searchInput {
+  width: calc(100% - 40px); /* Ancho del input con padding */
+  padding: 10px; /* Espaciado interno del input */
+  margin-bottom: 20px; /* Margen inferior del input */
+  border: 1px solid #ddd; /* Borde del input */
+  border-radius: 8px; /* Bordes redondeados del input */
+  outline: none; /* Sin contorno al enfocar */
+  transition: all 0.3s ease; /* Transición al cambiar el borde */
+  box-shadow: inset 0px 1px 3px rgba(0, 0, 0, 0.1); /* Sombra interna del input */
+  font-size: 14px; /* Tamaño del texto del input */
+}
+
+#searchInput:focus {
+  border: 2px solid #6200ea; /* Borde del input al enfocar */
+  box-shadow: 0px 0px 5px rgba(98, 0, 234, 0.5); /* Sombra del input al enfocar */
+}
+/* ===================== Fin del diseño del input de búsqueda ===================== */
